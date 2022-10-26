@@ -12,22 +12,33 @@ public class Client {
             new BufferedReader(new InputStreamReader(System.in));
 
     public static void main(String[] args) {
+        System.out.println("""
+                Please enter a message recording method
+                1 - Print message to console
+                2 - Write message to file:
+                """);
+        Integer strategy = Integer.parseInt(inputStream());
+        WriteStrategy writeStrategy = defineStrategy(strategy);
+        System.out.println("""
+                Please enter the message:
+                """);
+        String message = inputStream();
+        System.out.println("Please enter sender's name");
+        String sender = inputStream();
+        System.out.println("Please enter recipient's name");
+        String recipient = inputStream();
+        writeStrategy.writeTheMessage(message,sender,recipient);
+
+    }
+
+    private static String inputStream() {
+        String text = "";
         try {
-            System.out.println("""
-                    Please enter a message recording method
-                    1 - Print message to console
-                    2 - Write message to file:
-                    """);
-            Integer strategy = Integer.parseInt(bufferedReader.readLine());
-            WriteStrategy writeStrategy = defineStrategy(strategy);
-            System.out.println("""
-                    Please enter the message:
-                    """);
-            String message = bufferedReader.readLine();
-            writeStrategy.writeTheMessage(message);
+            text = bufferedReader.readLine();
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            System.out.println("Data entry error");
         }
+        return text;
     }
 
     private static WriteStrategy defineStrategy(Integer value) {

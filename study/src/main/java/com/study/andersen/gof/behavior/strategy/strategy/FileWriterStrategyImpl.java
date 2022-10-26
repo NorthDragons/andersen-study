@@ -12,9 +12,8 @@ public class FileWriterStrategyImpl implements WriteStrategy {
     private final StringBuilder finalMessage = new StringBuilder();
 
     @Override
-    public void writeTheMessage(String message) {
-        collectMailDetails();
-        finalMessage.append(message);
+    public void writeTheMessage(String message, String sender, String recipient) {
+        collectMailDetails(sender, recipient, message);
         try (OutputStream fos = new FileOutputStream("./message")) {
             fos.write(finalMessage.toString().getBytes(), 0, finalMessage.length());
         } catch (IOException ex) {
@@ -22,19 +21,11 @@ public class FileWriterStrategyImpl implements WriteStrategy {
         }
     }
 
-    private void collectMailDetails() {
-        String sender = "";
-        String recipient = "";
-        try {
-            System.out.println("Please enter sender's name");
-            sender = reader.readLine();
-            System.out.println("Please enter recipient's name");
-            recipient = reader.readLine();
-        } catch (IOException e) {
-            System.out.println("Data entry error");
-        }
+    private void collectMailDetails(String sender, String recipient, String message) {
         finalMessage.append("Sender: ").append(sender)
                 .append("\nRecipient: ").append(recipient)
-                .append("\n");
+                .append("\n").append(message);
     }
+
+
 }
