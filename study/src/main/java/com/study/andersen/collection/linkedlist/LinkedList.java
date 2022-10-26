@@ -1,8 +1,6 @@
 package com.study.andersen.collection.linkedlist;
 
-import java.util.List;
-
-public class Test<E> {
+public class LinkedList<E> {
 
     int size = 0;
     Node<E> first = null;
@@ -14,7 +12,7 @@ public class Test<E> {
         } else {
             addFirst(element);
         }
-        size++;
+
     }
 
     public void add(int index, E element) {
@@ -27,7 +25,6 @@ public class Test<E> {
                 addBefore(element, node(index));
             }
         }
-        size++;
     }
 
     private void addBefore(E newElem, Node<E> beforeElem) {
@@ -39,7 +36,11 @@ public class Test<E> {
     public void addFirst(E element) {
         if (first != null) {
             Node<E> f = first;
-            first = new Node<>(null, element, first.next);
+            first = new Node<>(null, element, f);
+            f.prev = first;
+            if (last == null) {
+                last = f;
+            }
         } else {
             first = new Node<>(null, element, null);
         }
@@ -47,17 +48,27 @@ public class Test<E> {
     }
 
     public void addLast(E element) {
+        if (last == null && first == null) {
+            addFirst(element);
+        } else {
+            Node<E> l;
+            if (last == null) {
+                l = first;
+            } else {
+                l = last;
+            }
+            last = new Node<>(l, element, null);
+            l.next = last;
+            size++;
+        }
 
-        Node<E> l = last == null ? first : last;
-        last = new Node<>(last, element, null);
-        size++;
     }
 
 
     Node<E> node(int index) {
         Node<E> x;
 
-        if (index < (size >> 1) && index > 1) {
+        if (index < (size >> 1)) {
             x = first;
 
             for (int i = 0; i < index; i++) {
@@ -82,49 +93,14 @@ public class Test<E> {
         return size;
     }
 
-//    public void addAll(List<E> collection) {
-//        addAll(size, collection);
-//    }
-
-//    public <T> void addAll(int index, List<T> c) {
-//        checkPositionIndex(index);
-//        Object[] a = c.toArray();
-//        int numNew = a.length;
-//        if (numNew != 0) {
-//            Node<E> pred, succ;
-//            if (index == size) {
-//                succ = null;
-//                pred = last;
-//            } else {
-//                succ = node(index);
-//                pred = succ.prev;
-//            }
-//            for (Object o : a) {
-//                @SuppressWarnings("unchecked") E e = (E) o;
-//                Node<E> newNode = new Node<>(pred, e, null);
-//                if (pred == null) {
-//                    first = newNode;
-//                } else {
-//                    pred.next = newNode;
-//                }
-//                pred = newNode;
-//            }
-//
-//            if (succ == null) {
-//                last = pred;
-//            } else {
-//                pred.next = succ;
-//                succ.prev = pred;
-//            }
-//            size += numNew;
-//        }
-//    }
-
     public boolean contains(E obj) {
         return indexOf(obj) >= 0;
     }
 
     public E get(int i) {
+        if (!isPositionIndex(i)) {
+            throw new IndexOutOfBoundsException("exx");
+        }
         return node(i).item;
     }
 
@@ -138,6 +114,10 @@ public class Test<E> {
 
     public void remove() {
         removeFirst();
+    }
+
+    public void remove(int index) {
+        remove(node(index));
     }
 
     public void remove(Object o) {
@@ -156,24 +136,25 @@ public class Test<E> {
         }
     }
 
-    public void remove(int index) {
-        Node<E> x = node(index);
-        final Node<E> next = x.next;
-        final Node<E> prev = x.prev;
+    public void remove(Node<E> index) {
+        final Node<E> next = index.next;
+        final Node<E> prev = index.prev;
+
         if (prev == null) {
             first = next;
         } else {
             prev.next = next;
-            x.prev = null;
+            index.prev = null;
         }
 
         if (next == null) {
             last = prev;
         } else {
             next.prev = prev;
-            x.next = null;
+            index.next = null;
         }
-        x.item = null;
+
+        index.item = null;
         size--;
     }
 
@@ -193,18 +174,6 @@ public class Test<E> {
         last = last.prev;
         last.next = null;
         size--;
-    }
-
-    private static class Node<E> {
-        E item;
-        Node<E> next;
-        Node<E> prev;
-
-        Node(Node<E> prev, E element, Node<E> next) {
-            this.item = element;
-            this.next = next;
-            this.prev = prev;
-        }
     }
 
     private void checkPositionIndex(int index) {
