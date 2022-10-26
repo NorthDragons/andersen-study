@@ -22,8 +22,7 @@ public class FileWriterStrategyImpl implements WriteStrategy {
         }
     }
 
-    @Override
-    public void collectMailDetails() {
+    private void collectMailDetails() {
         String sender = "";
         String recipient = "";
         try {

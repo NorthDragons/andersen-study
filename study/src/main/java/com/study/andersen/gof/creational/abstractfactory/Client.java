@@ -7,8 +7,8 @@ import com.study.andersen.gof.creational.abstractfactory.factory.WindowsAbstract
 public class Client {
 
     /**
-     * Приложение выбирает тип и создаёт конкретные фабрики динамически исходя
-     * из конфигурации или окружения.
+     * The application selects the type and creates specific factories dynamically based on
+     * from configuration or environment.
      */
     private static Application configureApplication() {
         Application app;

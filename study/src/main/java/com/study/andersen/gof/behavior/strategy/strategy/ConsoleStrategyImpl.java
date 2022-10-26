@@ -16,8 +16,7 @@ public class ConsoleStrategyImpl implements WriteStrategy {
         System.out.println(finalMessage);
     }
 
-    @Override
-    public void collectMailDetails() {
+    private void collectMailDetails() {
         String sender = "";
         String recipient = "";
         try {
