@@ -125,9 +125,16 @@ public class ArrayList<E> implements Serializable {
     }
 
     public void remove(E element) {
+
     }
 
     public void remove(int index) {
+        Objects.checkIndex(index, size);
+        int newSize;
+        if ((newSize = size - 1) > index) {
+            System.arraycopy(elementData, index + 1, elementData, index, newSize - index);
+        }
+        elementData[size = newSize] = null;
     }
 
     public void removeAll(List<E> asList) {
