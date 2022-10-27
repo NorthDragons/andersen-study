@@ -4,9 +4,7 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
 import java.util.Objects;
-import java.util.function.Predicate;
 
 
 public class ArrayList<E> implements Serializable {
@@ -114,7 +112,7 @@ public class ArrayList<E> implements Serializable {
 
     private Object[] grow(int minCapacity) {
         int oldCapacity = elementData.length;
-        if (oldCapacity > 0 && elementData != DEFAULTCAPACITY_EMPTY_ELEMENTDATA) {
+        if (oldCapacity > 0) {
             int newCapacity = ArraysSupport.newLength(oldCapacity,
                     minCapacity - oldCapacity,
                     oldCapacity >> 1);
@@ -125,22 +123,34 @@ public class ArrayList<E> implements Serializable {
     }
 
     public void remove(E element) {
-
+        if (element == null) {
+            for (int i = 0; i < elementData.length; i++) {
+                if (elementData[i] == null) {
+                    remover(i);
+                    break;
+                }
+            }
+        } else {
+            for (int i = 0; i < elementData.length; i++) {
+                if (elementData[i] == element) {
+                    remover(i);
+                    break;
+                }
+            }
+        }
     }
 
-    public void remove(int index) {
-        Objects.checkIndex(index, size);
-        int newSize;
-        if ((newSize = size - 1) > index) {
+    private void remover(int index) {
+        int newSize = size - 1;
+        if (newSize > index) {
             System.arraycopy(elementData, index + 1, elementData, index, newSize - index);
         }
         elementData[size = newSize] = null;
     }
 
-    public void removeAll(List<E> asList) {
-    }
-
-    public void removeIf(Predicate<E> predicate) {
+    public void remove(int index) {
+        Objects.checkIndex(index, size);
+        remover(index);
     }
 
     public int size() {

@@ -1,6 +1,9 @@
 package com.andersen.collection.arraylist;
 
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+
 import com.study.andersen.collection.arraylist.ArrayList;
 import java.util.Arrays;
 import org.junit.jupiter.api.Test;
@@ -28,9 +31,22 @@ public class ArrayListTest {
     @Test
     public void remove() {
         ArrayList<Integer> arrayList = new ArrayList<>(Arrays.asList(0, 0, 1, 2, 2, 3, 4, 5, 6, 7));
-        arrayList.remove(1);
-        arrayList.remove(Integer.valueOf(2));
-        arrayList.removeAll(Arrays.asList(3, 4, 1));
-        arrayList.removeIf(value -> (value < 2));
+        int startSize = arrayList.size();
+        assertEquals(4, arrayList.get(6));
+        arrayList.remove(6);
+        assertNotEquals(4, arrayList.get(6));
+        assertEquals(5, arrayList.get(6));
+        assertEquals(startSize - 1, arrayList.size());
     }
+
+    @Test
+    public void removeObject() {
+        ArrayList<Integer> arrayList = new ArrayList<>(Arrays.asList(0, 0, 1, 2, 2, 3, null));
+        int size = arrayList.size();
+        arrayList.remove(Integer.valueOf(2));
+        assertEquals(size - 1, arrayList.size());
+        arrayList.remove(null);
+        assertEquals(size - 2, arrayList.size());
+    }
+
 }
