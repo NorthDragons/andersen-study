@@ -1,9 +1,7 @@
 package com.study.andersen.collection.treemap;
 
 import java.util.Comparator;
-import java.util.Iterator;
 import java.util.Map;
-import java.util.NoSuchElementException;
 import java.util.Objects;
 
 public class TreeMap<K, V> {
@@ -63,6 +61,15 @@ public class TreeMap<K, V> {
     public V get(Object key) {
         Entry<K, V> p = getEntry(key);
         return (p == null ? null : p.value);
+    }
+
+    public void remove(Object key) {
+        Entry<K, V> entry = getEntry(key);
+        if (entry == null) {
+            return;
+        }
+        V oldValue = entry.value;
+        deleteEntry(entry);
     }
 
     public void put(K key, V value) {
@@ -243,64 +250,64 @@ public class TreeMap<K, V> {
         }
     }
 
-    static <K, V> Entry<K, V> successor(Entry<K, V> t) {
-        if (t == null) {
+    static <K, V> Entry<K, V> successor(Entry<K, V> entry) {
+        if (entry == null) {
             return null;
-        } else if (t.right != null) {
-            Entry<K, V> p = t.right;
-            while (p.left != null) {
-                p = p.left;
+        } else if (entry.right != null) {
+            Entry<K, V> right = entry.right;
+            while (right.left != null) {
+                right = right.left;
             }
-            return p;
+            return right;
         } else {
-            Entry<K, V> p = t.parent;
-            Entry<K, V> ch = t;
-            while (p != null && ch == p.right) {
-                ch = p;
-                p = p.parent;
+            Entry<K, V> parent = entry.parent;
+            Entry<K, V> ch = entry;
+            while (parent != null && ch == parent.right) {
+                ch = parent;
+                parent = parent.parent;
             }
-            return p;
+            return parent;
         }
     }
 
-    private void deleteEntry(Entry<K, V> p) {
+    private void deleteEntry(Entry<K, V> entry) {
         size--;
-        if (p.left != null && p.right != null) {
-            Entry<K, V> s = successor(p);
-            p.key = s.key;
-            p.value = s.value;
-            p = s;
+        if (entry.left != null && entry.right != null) {
+            Entry<K, V> s = successor(entry);
+            entry.key = s.key;
+            entry.value = s.value;
+            entry = s;
         }
 
-        Entry<K, V> replacement = (p.left != null ? p.left : p.right);
+        Entry<K, V> replacement = (entry.left != null ? entry.left : entry.right);
 
         if (replacement != null) {
-            replacement.parent = p.parent;
-            if (p.parent == null) {
+            replacement.parent = entry.parent;
+            if (entry.parent == null) {
                 root = replacement;
-            } else if (p == p.parent.left) {
-                p.parent.left = replacement;
+            } else if (entry == entry.parent.left) {
+                entry.parent.left = replacement;
             } else {
-                p.parent.right = replacement;
+                entry.parent.right = replacement;
             }
-            p.left = p.right = p.parent = null;
-            if (p.color == BLACK) {
+            entry.left = entry.right = entry.parent = null;
+            if (entry.color == BLACK) {
                 fixAfterDeletion(replacement);
             }
-        } else if (p.parent == null) {
+        } else if (entry.parent == null) {
             root = null;
         } else {
-            if (p.color == BLACK) {
-                fixAfterDeletion(p);
+            if (entry.color == BLACK) {
+                fixAfterDeletion(entry);
             }
 
-            if (p.parent != null) {
-                if (p == p.parent.left) {
-                    p.parent.left = null;
-                } else if (p == p.parent.right) {
-                    p.parent.right = null;
+            if (entry.parent != null) {
+                if (entry == entry.parent.left) {
+                    entry.parent.left = null;
+                } else if (entry == entry.parent.right) {
+                    entry.parent.right = null;
                 }
-                p.parent = null;
+                entry.parent = null;
             }
         }
     }
