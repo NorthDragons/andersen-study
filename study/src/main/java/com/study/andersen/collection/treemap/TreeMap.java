@@ -1,7 +1,9 @@
 package com.study.andersen.collection.treemap;
 
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Objects;
 
 public class TreeMap<K, V> {
@@ -18,17 +20,12 @@ public class TreeMap<K, V> {
         this.comparator = null;
     }
 
-    public TreeMap(Map<? extends K, ? extends V> m) {
-        comparator = null;
-        putAll(m);
-    }
-
-    private void putAll(Map<? extends K, ? extends V> m) {
-
-    }
-
     private static final boolean BLACK = true;
     private static final boolean RED = false;
+
+    public int size() {
+        return size;
+    }
 
     static final class Entry<K, V> implements Map.Entry<K, V> {
 
@@ -60,10 +57,20 @@ public class TreeMap<K, V> {
         public V setValue(V value) {
             return this.value = value;
         }
+
+    }
+
+    public V get(Object key) {
+        Entry<K, V> p = getEntry(key);
+        return (p == null ? null : p.value);
     }
 
     public void put(K key, V value) {
         Entry<K, V> parent = root;
+        if (parent == null) {
+            addEntryToEmptyMap(key, value);
+            return;
+        }
         int compareResult;
         if (comparator != null) {
             do {
@@ -106,6 +113,18 @@ public class TreeMap<K, V> {
         }
         fixAfterInsertion(entry);
         size++;
+    }
+
+    private void addEntryToEmptyMap(K key, V value) {
+        compare(key, key);
+        root = new Entry<>(key, value, null);
+        size = 1;
+    }
+
+    @SuppressWarnings("unchecked")
+    final int compare(Object k1, Object k2) {
+        return comparator == null ? ((Comparable<? super K>) k1).compareTo((K) k2)
+                : comparator.compare((K) k1, (K) k2);
     }
 
     private void fixAfterInsertion(Entry<K, V> entry) {
@@ -224,5 +243,169 @@ public class TreeMap<K, V> {
         }
     }
 
+    static <K, V> Entry<K, V> successor(Entry<K, V> t) {
+        if (t == null) {
+            return null;
+        } else if (t.right != null) {
+            Entry<K, V> p = t.right;
+            while (p.left != null) {
+                p = p.left;
+            }
+            return p;
+        } else {
+            Entry<K, V> p = t.parent;
+            Entry<K, V> ch = t;
+            while (p != null && ch == p.right) {
+                ch = p;
+                p = p.parent;
+            }
+            return p;
+        }
+    }
+
+    private void deleteEntry(Entry<K, V> p) {
+        size--;
+        if (p.left != null && p.right != null) {
+            Entry<K, V> s = successor(p);
+            p.key = s.key;
+            p.value = s.value;
+            p = s;
+        }
+
+        Entry<K, V> replacement = (p.left != null ? p.left : p.right);
+
+        if (replacement != null) {
+            replacement.parent = p.parent;
+            if (p.parent == null) {
+                root = replacement;
+            } else if (p == p.parent.left) {
+                p.parent.left = replacement;
+            } else {
+                p.parent.right = replacement;
+            }
+            p.left = p.right = p.parent = null;
+            if (p.color == BLACK) {
+                fixAfterDeletion(replacement);
+            }
+        } else if (p.parent == null) {
+            root = null;
+        } else {
+            if (p.color == BLACK) {
+                fixAfterDeletion(p);
+            }
+
+            if (p.parent != null) {
+                if (p == p.parent.left) {
+                    p.parent.left = null;
+                } else if (p == p.parent.right) {
+                    p.parent.right = null;
+                }
+                p.parent = null;
+            }
+        }
+    }
+
+    private void fixAfterDeletion(Entry<K, V> x) {
+        while (x != root && colorOf(x) == BLACK) {
+            if (x == leftOf(parentOf(x))) {
+                Entry<K, V> sib = rightOf(parentOf(x));
+
+                if (colorOf(sib) == RED) {
+                    setColor(sib, BLACK);
+                    setColor(parentOf(x), RED);
+                    rotateLeft(parentOf(x));
+                    sib = rightOf(parentOf(x));
+                }
+
+                if (colorOf(leftOf(sib)) == BLACK &&
+                        colorOf(rightOf(sib)) == BLACK) {
+                    setColor(sib, RED);
+                    x = parentOf(x);
+                } else {
+                    if (colorOf(rightOf(sib)) == BLACK) {
+                        setColor(leftOf(sib), BLACK);
+                        setColor(sib, RED);
+                        rotateRight(sib);
+                        sib = rightOf(parentOf(x));
+                    }
+                    setColor(sib, colorOf(parentOf(x)));
+                    setColor(parentOf(x), BLACK);
+                    setColor(rightOf(sib), BLACK);
+                    rotateLeft(parentOf(x));
+                    x = root;
+                }
+            } else {
+                Entry<K, V> sib = leftOf(parentOf(x));
+
+                if (colorOf(sib) == RED) {
+                    setColor(sib, BLACK);
+                    setColor(parentOf(x), RED);
+                    rotateRight(parentOf(x));
+                    sib = leftOf(parentOf(x));
+                }
+
+                if (colorOf(rightOf(sib)) == BLACK &&
+                        colorOf(leftOf(sib)) == BLACK) {
+                    setColor(sib, RED);
+                    x = parentOf(x);
+                } else {
+                    if (colorOf(leftOf(sib)) == BLACK) {
+                        setColor(rightOf(sib), BLACK);
+                        setColor(sib, RED);
+                        rotateLeft(sib);
+                        sib = leftOf(parentOf(x));
+                    }
+                    setColor(sib, colorOf(parentOf(x)));
+                    setColor(parentOf(x), BLACK);
+                    setColor(leftOf(sib), BLACK);
+                    rotateRight(parentOf(x));
+                    x = root;
+                }
+            }
+        }
+
+        setColor(x, BLACK);
+    }
+
+    final Entry<K, V> getEntry(Object key) {
+        if (comparator != null) {
+            return getEntryUsingComparator(key);
+        }
+        Objects.requireNonNull(key);
+        @SuppressWarnings("unchecked")
+        Comparable<? super K> k = (Comparable<? super K>) key;
+        Entry<K, V> p = root;
+        while (p != null) {
+            int cmp = k.compareTo(p.key);
+            if (cmp < 0) {
+                p = p.left;
+            } else if (cmp > 0) {
+                p = p.right;
+            } else {
+                return p;
+            }
+        }
+        return null;
+    }
+
+    final Entry<K, V> getEntryUsingComparator(Object key) {
+        @SuppressWarnings("unchecked")
+        K k = (K) key;
+        Comparator<? super K> cpr = comparator;
+        if (cpr != null) {
+            Entry<K, V> p = root;
+            while (p != null) {
+                int cmp = cpr.compare(k, p.key);
+                if (cmp < 0) {
+                    p = p.left;
+                } else if (cmp > 0) {
+                    p = p.right;
+                } else {
+                    return p;
+                }
+            }
+        }
+        return null;
+    }
 
 }

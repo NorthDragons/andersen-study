@@ -1,6 +1,7 @@
 package com.andersen.collection.treemap;
 
-import java.util.TreeMap;
+
+import com.study.andersen.collection.treemap.TreeMap;
 import org.junit.jupiter.api.Test;
 
 public class TreeMapTest {
@@ -9,7 +10,7 @@ public class TreeMapTest {
         TreeMap<Integer, Integer> map = new TreeMap<>();
         map.put(1, 1);
         System.out.println(map.size());
-        map.descendingMap();
-
+        Integer integer = map.get(1);
+        System.out.println(integer);
     }
 }
