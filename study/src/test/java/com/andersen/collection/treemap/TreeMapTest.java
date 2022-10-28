@@ -5,18 +5,21 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.study.andersen.collection.treemap.TreeMap;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
 
 public class TreeMapTest {
     @Test
     public void putPutElementByKeySizeIncrease() {
+        java.util.TreeMap<Integer,Integer> m1ap=new java.util.TreeMap<>();
+        m1ap.put(1,1);
         TreeMap<Integer, Integer> map = new TreeMap<>();
         map.put(1, 1);
         map.put(3, 1);
         map.put(2, 1);
         map.put(5, 1);
         assertAll(
-                () -> assertEquals(1, map.size()),
+                () -> assertEquals(4, map.size()),
                 () -> assertEquals(1, map.get(1))
         );
     }

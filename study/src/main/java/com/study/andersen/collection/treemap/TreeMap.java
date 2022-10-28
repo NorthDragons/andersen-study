@@ -8,7 +8,7 @@ public class TreeMap<K, V> {
     private final Comparator<? super K> comparator;
     private int size = 0;
 
-    private Entry<K, V> root;
+    private transient Entry<K, V> root;
 
     public TreeMap(Comparator<? super K> comparator) {
         this.comparator = comparator;
@@ -73,42 +73,45 @@ public class TreeMap<K, V> {
     }
 
     public void put(K key, V value) {
-        Entry<K, V> parent = root;
-        if (parent == null) {
-            addEntryToEmptyMap(key, value);
-            return;
-        }
-        int compareResult;
-        if (comparator != null) {
-            do {
-                compareResult = comparator.compare(key, parent.key);
-                if (compareResult < 0) {
-                    parent = parent.left;
-                } else if (compareResult > 0) {
-                    parent = parent.right;
-                } else {
-                    root.value = value;
-                    return;
-                }
-            } while (parent != null);
-        } else {
-            Objects.requireNonNull(key);
-            @SuppressWarnings("unchecked")
-            Comparable<? super K> comparableKey = (Comparable<? super K>) key;
-            do {
-                compareResult = comparableKey.compareTo(parent.key);
-                if (compareResult < 0) {
-                    parent = parent.left;
+        Entry<K, V> root1 = root;
+        if (root != null) {
+            int compareResult;
+            Entry<K, V> parent;
+            if (comparator != null) {
+                do {
+                    parent = root1;
+                    compareResult = comparator.compare(key, parent.key);
+                    if (compareResult < 0) {
+                        root1 = parent.left;
+                    } else if (compareResult > 0) {
+                        root1 = parent.right;
+                    } else {
+                        root.value = value;
+                        return;
+                    }
+                } while (root1 != null);
+            } else {
+                Objects.requireNonNull(key);
+                @SuppressWarnings("unchecked")
+                Comparable<? super K> comparableKey = (Comparable<? super K>) key;
+                do {
+                    parent = root1;
+                    compareResult = comparableKey.compareTo(parent.key);
+                    if (compareResult < 0) {
+                        root1 = parent.left;
 
-                } else if (compareResult > 0) {
-                    parent = parent.right;
-                } else {
-                    root.value = value;
-                    return;
-                }
-            } while (parent != null);
+                    } else if (compareResult > 0) {
+                        root1 = parent.right;
+                    } else {
+                        root.value = value;
+                        return;
+                    }
+                } while (root1 != null);
+            }
+            addEntry(key, value, parent, compareResult < 0);
+        } else {
+            addEntryToEmptyMap(key, value);
         }
-        addEntry(key, value, parent, compareResult < 0);
     }
 
     private void addEntry(K key, V value, Entry<K, V> parent, boolean addToLeft) {
