@@ -52,6 +52,9 @@ public class LinkedList<E> {
             }
         } else {
             first = new Node<>(null, element, null);
+            if (last == null) {
+                last = first;
+            }
         }
         size++;
     }
