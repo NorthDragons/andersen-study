@@ -58,7 +58,7 @@ public class TreeMap<K, V> {
 
     }
 
-    public V get(Object key) {
+    public V get(K key) {
         Entry<K, V> p = getEntry(key);
         return (p == null ? null : p.value);
     }
