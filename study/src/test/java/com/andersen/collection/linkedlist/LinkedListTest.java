@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import com.study.andersen.collection.linkedlist.LinkedList;
+import java.util.Arrays;
 import org.junit.jupiter.api.Test;
 
 public class LinkedListTest {
@@ -68,20 +69,18 @@ public class LinkedListTest {
 
     @Test
     public void remove() {
-        LinkedList<Integer> list = new LinkedList<>();
         Integer[] integers = new Integer[] {1, 2, 3, 4, 5};
-        list.add(integers[0]);
-        list.add(integers[1]);
-        list.add(integers[2]);
-        list.add(integers[3]);
-        list.add(integers[4]);
-        assertEquals(list.size(),5);
+        LinkedList<Integer> list = new LinkedList<>(Arrays.asList(integers));
+        list.add(1);
+        list.add(2);
+        list.add(3);
+        list.add(4);
+        list.add(5);
         list.remove();
         list.remove(1);
         list.remove(Integer.valueOf(2));
         list.removeLast();
         list.removeFirst();
-        assertEquals(list.size(),0);
-
+        assertEquals(list.size(), 0);
     }
 }

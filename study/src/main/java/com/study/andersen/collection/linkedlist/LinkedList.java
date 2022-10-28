@@ -1,10 +1,19 @@
 package com.study.andersen.collection.linkedlist;
 
+import java.util.List;
+
 public class LinkedList<E> {
 
     int size = 0;
     Node<E> first = null;
     Node<E> last = null;
+
+    public LinkedList(List<E> asList) {
+
+    }
+
+    public LinkedList() {
+    }
 
     public void add(E element) {
         if (size != 0) {
@@ -136,25 +145,25 @@ public class LinkedList<E> {
         }
     }
 
-    public void remove(Node<E> index) {
-        final Node<E> next = index.next;
-        final Node<E> prev = index.prev;
+    public void remove(Node<E> node) {
+        final Node<E> next = node.next;
+        final Node<E> prev = node.prev;
 
         if (prev == null) {
             first = next;
         } else {
             prev.next = next;
-            index.prev = null;
+            node.prev = null;
         }
 
         if (next == null) {
             last = prev;
         } else {
             next.prev = prev;
-            index.next = null;
+            node.next = null;
         }
 
-        index.item = null;
+        node.item = null;
         size--;
     }
 

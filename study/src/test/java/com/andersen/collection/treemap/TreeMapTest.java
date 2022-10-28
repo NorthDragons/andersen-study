@@ -12,5 +12,9 @@ public class TreeMapTest {
         System.out.println(map.size());
         Integer integer = map.get(1);
         System.out.println(integer);
+        map.remove(1);
+        Integer integer2 = map.get(1);
+        System.out.println(integer2);
+
     }
 }

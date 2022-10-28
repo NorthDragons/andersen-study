@@ -59,8 +59,16 @@ public class ArrayList<E> implements Serializable {
         if (index > size || index < 0) {
             throw new IndexOutOfBoundsException("indexOutOfBoundsException: size - " + size);
         }
-
-
+        final int s;
+        Object[] elementData;
+        if ((s = size) == (elementData = this.elementData).length) {
+            elementData = grow();
+        }
+        System.arraycopy(elementData, index,
+                elementData, index + 1,
+                s - index);
+        elementData[index] = elem;
+        size = s + 1;
     }
 
     public void addAll(Collection<? extends E> collection) {

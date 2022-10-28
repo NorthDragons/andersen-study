@@ -1,6 +1,7 @@
 package com.andersen.collection.arraylist;
 
 
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
@@ -10,43 +11,89 @@ import org.junit.jupiter.api.Test;
 
 public class ArrayListTest {
 
+    ArrayList<Integer> arrayList = new ArrayList<>(Arrays.asList(0, 0, 1, 2, 2, 3, 4, 5, 6, 7));
+    int oldSize = arrayList.size();
 
     @Test
-    public void add() {
+    public void addItemHaveToBeAddedToTheEndOfArraySizeIncrease() {
         ArrayList<Integer> arrayList = new ArrayList<>();
-        arrayList.add(0, 1);
+        arrayList.add(1);
         arrayList.add(2);
+        arrayList.add(3);
+        assertAll(
+                () -> assertEquals(3, arrayList.size()),
+                () -> assertEquals(1, arrayList.get(0)),
+                () -> assertEquals(2, arrayList.get(1)),
+                () -> assertEquals(3, arrayList.get(2))
+        );
+    }
+
+    @Test
+    public void addItemHaveToBeAddedAtIndexSizeIncrease() {
+        int oldItem = arrayList.get(5);
+        arrayList.add(5, 1);
+        assertAll(
+                () -> assertEquals(1, arrayList.get(5)),
+                () -> assertEquals(oldItem, arrayList.get(6)),
+                () -> assertEquals(oldSize + 1, arrayList.size())
+        );
+    }
+
+    @Test
+    public void addAllItemsHaveToBeAddedToTheEndOfArraySizeIncrease() {
         arrayList.addAll(Arrays.asList(3, 4, 5));
-        arrayList.addAll(0, Arrays.asList(-4, -3, -2, -1, 0));
-        System.out.println(arrayList);
+        assertAll(
+                () -> assertEquals(5, arrayList.get(arrayList.size() - 1)),
+                () -> assertEquals(4, arrayList.get(arrayList.size() - 2)),
+                () -> assertEquals(3, arrayList.get(arrayList.size() - 3)),
+                () -> assertEquals(oldSize + 3, arrayList.size())
+        );
     }
 
     @Test
-    public void get() {
-        ArrayList<Integer> arrayList = new ArrayList<>(Arrays.asList(1, 2, 3, 4, 5, 6, 7));
+    public void addAllItemsHaveToBeAddedToIndexPlaceSizeIncrease() {
+        int startIndex = 4;
+        arrayList.addAll(startIndex, Arrays.asList(-4, -3, -2));
+        assertAll(
+                () -> assertEquals(-4, arrayList.get(startIndex)),
+                () -> assertEquals(-3, arrayList.get(startIndex + 1)),
+                () -> assertEquals(-2, arrayList.get(startIndex + 2)),
+                () -> assertEquals(oldSize + 3, arrayList.size())
+        );
+    }
+
+    @Test
+    public void getReceiveSomeItemByIndex() {
+        ArrayList<Integer> arrayList = new ArrayList<>();
+        arrayList.add(7);
         Integer integer = arrayList.get(arrayList.size() - 1);
-        System.out.println(integer);
+        assertEquals(7, integer);
     }
 
     @Test
-    public void remove() {
-        ArrayList<Integer> arrayList = new ArrayList<>(Arrays.asList(0, 0, 1, 2, 2, 3, 4, 5, 6, 7));
-        int startSize = arrayList.size();
-        assertEquals(4, arrayList.get(6));
+    public void removeItemMustBeRemovedByIndexSizeShrink() {
+        int removedElem = arrayList.get(6);
+        int nextElem = arrayList.get(7);
         arrayList.remove(6);
-        assertNotEquals(4, arrayList.get(6));
-        assertEquals(5, arrayList.get(6));
-        assertEquals(startSize - 1, arrayList.size());
+        assertAll(
+                () -> assertNotEquals(removedElem, arrayList.get(6)),
+                () -> assertEquals(nextElem, arrayList.get(6)),
+                () -> assertEquals(oldSize - 1, arrayList.size())
+        );
     }
 
     @Test
-    public void removeObject() {
-        ArrayList<Integer> arrayList = new ArrayList<>(Arrays.asList(0, 0, 1, 2, 2, 3, null));
-        int size = arrayList.size();
+    public void removeItemMustBeRemovedByValueSizeShrink() {
+        ArrayList<Integer> arrayList = new ArrayList<>();
+        arrayList.add(2);
+        arrayList.add(3);
+        arrayList.add(2);
         arrayList.remove(Integer.valueOf(2));
-        assertEquals(size - 1, arrayList.size());
-        arrayList.remove(null);
-        assertEquals(size - 2, arrayList.size());
+        assertAll(
+                () -> assertEquals( 2, arrayList.size()),
+                () -> assertEquals(3, arrayList.get(0)),
+                () -> assertEquals(2, arrayList.get(1))
+        );
     }
 
 }
