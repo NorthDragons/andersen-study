@@ -34,12 +34,12 @@ public class ArrayList<E> implements Serializable {
     }
 
     public ArrayList(Collection<? extends E> c) {
-        Object[] a = c.toArray();
-        if ((size = a.length) != 0) {
+        Object[] array = c.toArray();
+        if ((size = array.length) != 0) {
             if (c.getClass() == java.util.ArrayList.class) {
-                elementData = a;
+                elementData = array;
             } else {
-                elementData = Arrays.copyOf(a, size, Object[].class);
+                elementData = Arrays.copyOf(array, size, Object[].class);
             }
         } else {
             elementData = EMPTY_ELEMENTDATA;
@@ -59,29 +59,29 @@ public class ArrayList<E> implements Serializable {
         if (index > size || index < 0) {
             throw new IndexOutOfBoundsException("indexOutOfBoundsException: size - " + size);
         }
-        final int s;
+        final int size;
         Object[] elementData;
-        if ((s = size) == (elementData = this.elementData).length) {
+        if ((size = this.size) == (elementData = this.elementData).length) {
             elementData = grow();
         }
         System.arraycopy(elementData, index,
                 elementData, index + 1,
-                s - index);
+                size - index);
         elementData[index] = elem;
-        size = s + 1;
+        this.size = size + 1;
     }
 
     public void addAll(Collection<? extends E> collection) {
-        Object[] a = collection.toArray();
-        int numNew = a.length;
+        Object[] array = collection.toArray();
+        int numNew = array.length;
         if (numNew != 0) {
             Object[] elementData;
-            final int s;
-            if (numNew > (elementData = this.elementData).length - (s = size)) {
-                elementData = grow(s + numNew);
+            final int size;
+            if (numNew > (elementData = this.elementData).length - (size = this.size)) {
+                elementData = grow(size + numNew);
             }
-            System.arraycopy(a, 0, elementData, s, numNew);
-            size = s + numNew;
+            System.arraycopy(array, 0, elementData, size, numNew);
+            this.size = size + numNew;
         }
     }
 
@@ -90,18 +90,18 @@ public class ArrayList<E> implements Serializable {
         int numNew = objects.length;
         if (numNew != 0) {
             Object[] elementData;
-            final int s;
-            if (numNew > (elementData = this.elementData).length - (s = size)) {
-                elementData = grow(s + numNew);
+            final int size;
+            if (numNew > (elementData = this.elementData).length - (size = this.size)) {
+                elementData = grow(size + numNew);
             }
-            int numMoved = s - index;
+            int numMoved = size - index;
             if (numMoved > 0) {
                 System.arraycopy(elementData, index,
                         elementData, index + numNew,
                         numMoved);
             }
             System.arraycopy(objects, 0, elementData, index, numNew);
-            size = s + numNew;
+            this.size = size + numNew;
         }
     }
 
@@ -110,6 +110,7 @@ public class ArrayList<E> implements Serializable {
         return elementData(index);
     }
 
+    @SuppressWarnings("unchecked")
     private E elementData(int index) {
         return (E) elementData[index];
     }
@@ -132,16 +133,16 @@ public class ArrayList<E> implements Serializable {
 
     public void remove(E element) {
         if (element == null) {
-            for (int i = 0; i < elementData.length; i++) {
-                if (elementData[i] == null) {
-                    remover(i);
+            for (int index = 0; index < elementData.length; index++) {
+                if (elementData[index] == null) {
+                    remover(index);
                     break;
                 }
             }
         } else {
-            for (int i = 0; i < elementData.length; i++) {
-                if (elementData[i] == element) {
-                    remover(i);
+            for (int index = 0; index < elementData.length; index++) {
+                if (elementData[index] == element) {
+                    remover(index);
                     break;
                 }
             }

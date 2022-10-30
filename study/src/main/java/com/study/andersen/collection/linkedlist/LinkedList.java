@@ -1,16 +1,13 @@
 package com.study.andersen.collection.linkedlist;
 
 import java.util.List;
+import java.util.Objects;
 
 public class LinkedList<E> {
 
     int size = 0;
     Node<E> first = null;
     Node<E> last = null;
-
-    public LinkedList(List<E> asList) {
-
-    }
 
     public LinkedList() {
     }
@@ -44,11 +41,11 @@ public class LinkedList<E> {
 
     public void addFirst(E element) {
         if (first != null) {
-            Node<E> f = first;
-            first = new Node<>(null, element, f);
-            f.prev = first;
+            Node<E> nextItem = first;
+            first = new Node<>(null, element, nextItem);
+            nextItem.prev = first;
             if (last == null) {
-                last = f;
+                last = nextItem;
             }
         } else {
             first = new Node<>(null, element, null);
@@ -63,14 +60,10 @@ public class LinkedList<E> {
         if (last == null && first == null) {
             addFirst(element);
         } else {
-            Node<E> l;
-            if (last == null) {
-                l = first;
-            } else {
-                l = last;
-            }
-            last = new Node<>(l, element, null);
-            l.next = last;
+            Node<E> previous;
+            previous = Objects.requireNonNullElseGet(this.last, () -> first);
+            this.last = new Node<>(previous, element, null);
+            previous.next = this.last;
             size++;
         }
 
@@ -78,21 +71,21 @@ public class LinkedList<E> {
 
 
     Node<E> node(int index) {
-        Node<E> x;
+        Node<E> node;
 
         if (index < (size >> 1)) {
-            x = first;
+            node = first;
 
             for (int i = 0; i < index; i++) {
-                x = x.next;
+                node = node.next;
             }
         } else {
-            x = last;
+            node = last;
             for (int i = size - 1; i > index; i--) {
-                x = x.prev;
+                node = node.prev;
             }
         }
-        return x;
+        return node;
     }
 
     public void clear() {
@@ -105,15 +98,15 @@ public class LinkedList<E> {
         return size;
     }
 
-    public boolean contains(E obj) {
-        return indexOf(obj) >= 0;
+    public boolean contains(E item) {
+        return indexOf(item) >= 0;
     }
 
-    public E get(int i) {
-        if (!isPositionIndex(i)) {
+    public E get(int index) {
+        if (!isPositionIndex(index)) {
             throw new IndexOutOfBoundsException("exx");
         }
-        return node(i).item;
+        return node(index).item;
     }
 
     public E getLast() {
@@ -132,17 +125,17 @@ public class LinkedList<E> {
         remove(node(index));
     }
 
-    public void remove(Object o) {
-        if (o == null) {
+    public void remove(Object item) {
+        if (item == null) {
             for (Node<E> x = first; x != null; x = x.next) {
                 if (x.item == null) {
                     remove(x);
                 }
             }
         } else {
-            for (Node<E> x = first; x != null; x = x.next) {
-                if (o.equals(x.item)) {
-                    remove(x);
+            for (Node<E> node = first; node != null; node = node.next) {
+                if (item.equals(node.item)) {
+                    remove(node);
                 }
             }
         }
@@ -202,18 +195,18 @@ public class LinkedList<E> {
         return index >= 0 && index <= size;
     }
 
-    public int indexOf(Object o) {
+    public int indexOf(Object item) {
         int index = 0;
-        if (o == null) {
-            for (Node<E> x = first; x != null; x = x.next) {
-                if (x.item == null) {
+        if (item == null) {
+            for (Node<E> node = first; node != null; node = node.next) {
+                if (node.item == null) {
                     return index;
                 }
                 index++;
             }
         } else {
-            for (Node<E> x = first; x != null; x = x.next) {
-                if (o.equals(x.item)) {
+            for (Node<E> node = first; node != null; node = node.next) {
+                if (item.equals(node.item)) {
                     return index;
                 }
                 index++;

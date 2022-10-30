@@ -59,8 +59,8 @@ public class TreeMap<K, V> {
     }
 
     public V get(K key) {
-        Entry<K, V> p = getEntry(key);
-        return (p == null ? null : p.value);
+        Entry<K, V> entry = getEntry(key);
+        return (entry == null ? null : entry.value);
     }
 
     public void remove(Object key) {
@@ -132,9 +132,9 @@ public class TreeMap<K, V> {
     }
 
     @SuppressWarnings("unchecked")
-    final int compare(Object k1, Object k2) {
-        return comparator == null ? ((Comparable<? super K>) k1).compareTo((K) k2)
-                : comparator.compare((K) k1, (K) k2);
+    final int compare(Object key1, Object key2) {
+        return comparator == null ? ((Comparable<? super K>) key1).compareTo((K) key2)
+                : comparator.compare((K) key1, (K) key2);
     }
 
     private void fixAfterInsertion(Entry<K, V> entry) {
@@ -211,21 +211,21 @@ public class TreeMap<K, V> {
 
     private void rotateLeft(Entry<K, V> entry) {
         if (entry != null) {
-            Entry<K, V> r = entry.right;
-            entry.right = r.left;
-            if (r.left != null) {
-                r.left.parent = entry;
+            Entry<K, V> rightEntry = entry.right;
+            entry.right = rightEntry.left;
+            if (rightEntry.left != null) {
+                rightEntry.left.parent = entry;
             }
-            r.parent = entry.parent;
+            rightEntry.parent = entry.parent;
             if (entry.parent == null) {
-                root = r;
+                root = rightEntry;
             } else if (entry.parent.left == entry) {
-                entry.parent.left = r;
+                entry.parent.left = rightEntry;
             } else {
-                entry.parent.right = r;
+                entry.parent.right = rightEntry;
             }
-            r.left = entry;
-            entry.parent = r;
+            rightEntry.left = entry;
+            entry.parent = rightEntry;
         }
     }
 
@@ -253,20 +253,20 @@ public class TreeMap<K, V> {
         }
     }
 
-    static <K, V> Entry<K, V> successor(Entry<K, V> entry) {
-        if (entry == null) {
+    static <K, V> Entry<K, V> successor(Entry<K, V> newEntry) {
+        if (newEntry == null) {
             return null;
-        } else if (entry.right != null) {
-            Entry<K, V> right = entry.right;
+        } else if (newEntry.right != null) {
+            Entry<K, V> right = newEntry.right;
             while (right.left != null) {
                 right = right.left;
             }
             return right;
         } else {
-            Entry<K, V> parent = entry.parent;
-            Entry<K, V> ch = entry;
-            while (parent != null && ch == parent.right) {
-                ch = parent;
+            Entry<K, V> parent = newEntry.parent;
+            Entry<K, V> entry1 = newEntry;
+            while (parent != null && entry1 == parent.right) {
+                newEntry = parent;
                 parent = parent.parent;
             }
             return parent;
@@ -276,10 +276,10 @@ public class TreeMap<K, V> {
     private void deleteEntry(Entry<K, V> entry) {
         size--;
         if (entry.left != null && entry.right != null) {
-            Entry<K, V> s = successor(entry);
-            entry.key = s.key;
-            entry.value = s.value;
-            entry = s;
+            Entry<K, V> succEntry = successor(entry);
+            entry.key = succEntry.key;
+            entry.value = succEntry.value;
+            entry = succEntry;
         }
 
         Entry<K, V> replacement = (entry.left != null ? entry.left : entry.right);
@@ -315,66 +315,66 @@ public class TreeMap<K, V> {
         }
     }
 
-    private void fixAfterDeletion(Entry<K, V> x) {
-        while (x != root && colorOf(x) == BLACK) {
-            if (x == leftOf(parentOf(x))) {
-                Entry<K, V> sib = rightOf(parentOf(x));
+    private void fixAfterDeletion(Entry<K, V> deletedEntry) {
+        while (deletedEntry != root && colorOf(deletedEntry) == BLACK) {
+            if (deletedEntry == leftOf(parentOf(deletedEntry))) {
+                Entry<K, V> rightOfParent = rightOf(parentOf(deletedEntry));
 
-                if (colorOf(sib) == RED) {
-                    setColor(sib, BLACK);
-                    setColor(parentOf(x), RED);
-                    rotateLeft(parentOf(x));
-                    sib = rightOf(parentOf(x));
+                if (colorOf(rightOfParent) == RED) {
+                    setColor(rightOfParent, BLACK);
+                    setColor(parentOf(deletedEntry), RED);
+                    rotateLeft(parentOf(deletedEntry));
+                    rightOfParent = rightOf(parentOf(deletedEntry));
                 }
 
-                if (colorOf(leftOf(sib)) == BLACK &&
-                        colorOf(rightOf(sib)) == BLACK) {
-                    setColor(sib, RED);
-                    x = parentOf(x);
+                if (colorOf(leftOf(rightOfParent)) == BLACK &&
+                        colorOf(rightOf(rightOfParent)) == BLACK) {
+                    setColor(rightOfParent, RED);
+                    deletedEntry = parentOf(deletedEntry);
                 } else {
-                    if (colorOf(rightOf(sib)) == BLACK) {
-                        setColor(leftOf(sib), BLACK);
-                        setColor(sib, RED);
-                        rotateRight(sib);
-                        sib = rightOf(parentOf(x));
+                    if (colorOf(rightOf(rightOfParent)) == BLACK) {
+                        setColor(leftOf(rightOfParent), BLACK);
+                        setColor(rightOfParent, RED);
+                        rotateRight(rightOfParent);
+                        rightOfParent = rightOf(parentOf(deletedEntry));
                     }
-                    setColor(sib, colorOf(parentOf(x)));
-                    setColor(parentOf(x), BLACK);
-                    setColor(rightOf(sib), BLACK);
-                    rotateLeft(parentOf(x));
-                    x = root;
+                    setColor(rightOfParent, colorOf(parentOf(deletedEntry)));
+                    setColor(parentOf(deletedEntry), BLACK);
+                    setColor(rightOf(rightOfParent), BLACK);
+                    rotateLeft(parentOf(deletedEntry));
+                    deletedEntry = root;
                 }
             } else {
-                Entry<K, V> sib = leftOf(parentOf(x));
+                Entry<K, V> leftOfParent = leftOf(parentOf(deletedEntry));
 
-                if (colorOf(sib) == RED) {
-                    setColor(sib, BLACK);
-                    setColor(parentOf(x), RED);
-                    rotateRight(parentOf(x));
-                    sib = leftOf(parentOf(x));
+                if (colorOf(leftOfParent) == RED) {
+                    setColor(leftOfParent, BLACK);
+                    setColor(parentOf(deletedEntry), RED);
+                    rotateRight(parentOf(deletedEntry));
+                    leftOfParent = leftOf(parentOf(deletedEntry));
                 }
 
-                if (colorOf(rightOf(sib)) == BLACK &&
-                        colorOf(leftOf(sib)) == BLACK) {
-                    setColor(sib, RED);
-                    x = parentOf(x);
+                if (colorOf(rightOf(leftOfParent)) == BLACK &&
+                        colorOf(leftOf(leftOfParent)) == BLACK) {
+                    setColor(leftOfParent, RED);
+                    deletedEntry = parentOf(deletedEntry);
                 } else {
-                    if (colorOf(leftOf(sib)) == BLACK) {
-                        setColor(rightOf(sib), BLACK);
-                        setColor(sib, RED);
-                        rotateLeft(sib);
-                        sib = leftOf(parentOf(x));
+                    if (colorOf(leftOf(leftOfParent)) == BLACK) {
+                        setColor(rightOf(leftOfParent), BLACK);
+                        setColor(leftOfParent, RED);
+                        rotateLeft(leftOfParent);
+                        leftOfParent = leftOf(parentOf(deletedEntry));
                     }
-                    setColor(sib, colorOf(parentOf(x)));
-                    setColor(parentOf(x), BLACK);
-                    setColor(leftOf(sib), BLACK);
-                    rotateRight(parentOf(x));
-                    x = root;
+                    setColor(leftOfParent, colorOf(parentOf(deletedEntry)));
+                    setColor(parentOf(deletedEntry), BLACK);
+                    setColor(leftOf(leftOfParent), BLACK);
+                    rotateRight(parentOf(deletedEntry));
+                    deletedEntry = root;
                 }
             }
         }
 
-        setColor(x, BLACK);
+        setColor(deletedEntry, BLACK);
     }
 
     final Entry<K, V> getEntry(Object key) {
@@ -384,15 +384,15 @@ public class TreeMap<K, V> {
         Objects.requireNonNull(key);
         @SuppressWarnings("unchecked")
         Comparable<? super K> k = (Comparable<? super K>) key;
-        Entry<K, V> p = root;
-        while (p != null) {
-            int cmp = k.compareTo(p.key);
-            if (cmp < 0) {
-                p = p.left;
-            } else if (cmp > 0) {
-                p = p.right;
+        Entry<K, V> root = this.root;
+        while (root != null) {
+            int compareResult = k.compareTo(root.key);
+            if (compareResult < 0) {
+                root = root.left;
+            } else if (compareResult > 0) {
+                root = root.right;
             } else {
-                return p;
+                return root;
             }
         }
         return null;
@@ -401,17 +401,17 @@ public class TreeMap<K, V> {
     final Entry<K, V> getEntryUsingComparator(Object key) {
         @SuppressWarnings("unchecked")
         K k = (K) key;
-        Comparator<? super K> cpr = comparator;
-        if (cpr != null) {
-            Entry<K, V> p = root;
-            while (p != null) {
-                int cmp = cpr.compare(k, p.key);
-                if (cmp < 0) {
-                    p = p.left;
-                } else if (cmp > 0) {
-                    p = p.right;
+        Comparator<? super K> comparator = this.comparator;
+        if (comparator != null) {
+            Entry<K, V> root = this.root;
+            while (root != null) {
+                int compareResult = comparator.compare(k, root.key);
+                if (compareResult < 0) {
+                    root = root.left;
+                } else if (compareResult > 0) {
+                    root = root.right;
                 } else {
-                    return p;
+                    return root;
                 }
             }
         }
