@@ -20,6 +20,8 @@ public class ArraysSupport {
         if (minLength < 0) {
             OutOfMemoryError exception = new OutOfMemoryError(
                     "Required array length " + oldLength + " + " + minGrowth + " is too large");
+            log.error("Exception: ",
+                    exception);
             log.error("Exception: ", exception);
             throw exception;
         } else {
