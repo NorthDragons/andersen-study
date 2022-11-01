@@ -5,9 +5,11 @@ import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Objects;
+import lombok.extern.slf4j.Slf4j;
 
-
+@Slf4j
 public class ArrayList<E> implements Serializable {
+
     @Serial
     private static final long serialVersionUID = 8683452581122892189L;
 
@@ -28,8 +30,11 @@ public class ArrayList<E> implements Serializable {
         } else if (initialCapacity == 0) {
             this.elementData = EMPTY_ELEMENTDATA;
         } else {
-            throw new IllegalArgumentException("Illegal Capacity: " +
+            IllegalArgumentException exception = new IllegalArgumentException("Illegal Capacity: " +
                     initialCapacity);
+            log.error("Exception: ",
+                    exception);
+            throw exception;
         }
     }
 
