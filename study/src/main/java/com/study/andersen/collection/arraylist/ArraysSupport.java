@@ -22,6 +22,7 @@ public class ArraysSupport {
                     "Required array length " + oldLength + " + " + minGrowth + " is too large");
             log.error("Exception: ",
                     exception);
+            log.error("Exception: ", exception);
             throw exception;
         } else {
             return Math.max(minLength, MAX_LENGTH);

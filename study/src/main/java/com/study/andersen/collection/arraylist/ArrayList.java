@@ -9,7 +9,6 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class ArrayList<E> implements Serializable {
-
     @Serial
     private static final long serialVersionUID = 8683452581122892189L;
 
@@ -32,8 +31,7 @@ public class ArrayList<E> implements Serializable {
         } else {
             IllegalArgumentException exception = new IllegalArgumentException("Illegal Capacity: " +
                     initialCapacity);
-            log.error("Exception: ",
-                    exception);
+            log.error("Exception:", exception);
             throw exception;
         }
     }
@@ -64,8 +62,7 @@ public class ArrayList<E> implements Serializable {
         if (index > size || index < 0) {
             IndexOutOfBoundsException exception =
                     new IndexOutOfBoundsException("indexOutOfBoundsException: size - " + size);
-            log.error("Exception: ",
-                    exception);
+            log.error("Exception: " + exception);
             throw exception;
         }
         final int size;
