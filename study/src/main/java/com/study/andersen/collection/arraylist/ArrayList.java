@@ -62,7 +62,11 @@ public class ArrayList<E> implements Serializable {
 
     public void add(int index, E elem) {
         if (index > size || index < 0) {
-            throw new IndexOutOfBoundsException("indexOutOfBoundsException: size - " + size);
+            IndexOutOfBoundsException exception =
+                    new IndexOutOfBoundsException("indexOutOfBoundsException: size - " + size);
+            log.error("Exception: ",
+                    exception);
+            throw exception;
         }
         final int size;
         Object[] elementData;
