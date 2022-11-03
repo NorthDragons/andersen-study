@@ -12,6 +12,10 @@ public class LinkedList<E> {
     public LinkedList() {
     }
 
+    public LinkedList(List<Integer> asList) {
+
+    }
+
     public void add(E element) {
         if (size != 0) {
             addLast(element);

@@ -1,5 +1,7 @@
 package com.study.andersen.shop;
 
+import com.study.andersen.shop.service.ProductServiceImpl;
+import com.study.andersen.shop.service.api.ProductService;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -9,15 +11,32 @@ import lombok.extern.log4j.Log4j2;
 public class Starter {
 
     private static boolean status;
+    private static final ProductService productService = new ProductServiceImpl();
 
     private static final BufferedReader bufferedReader =
             new BufferedReader(new InputStreamReader(System.in));
 
     public static void main(String[] args) {
-        System.out.println("Would you like to open a store? enter Y/N\nY - yes, N - no");
-        String s = inputStream();
-        while (s.equalsIgnoreCase("Y")){
-            System.out.println("Please select an action\n");
+        while (true) {
+            System.out.println("""
+                    Please select an action
+                    1)Open Catalog
+                    2)Open bucket
+                    3)close shop""");
+            makeTheAction();
+        }
+    }
+
+    private static void makeTheAction() {
+        int action = Integer.parseInt(inputStream());
+        switch (action) {
+            case 1 -> {
+                productService.showAll();
+            }
+            case 2 -> {
+                productService.showBucket();
+            }
+            case 3 -> System.exit(0);
         }
     }
 
@@ -30,4 +49,6 @@ public class Starter {
         }
         return text;
     }
+
+
 }
